@@ -1,0 +1,24 @@
+{
+  "base_model": "U:\\phi_died_gateway\\phi_data\\distilbert-base-uncased",
+  "params": 66389795,
+  "lora": false,
+  "lora_config": null,
+  "epochs": 8,
+  "batch_size": 8,
+  "lr": 3e-05,
+  "max_len": 256,
+  "final_eval_metrics": {
+    "eval_loss": 0.044256988912820816,
+    "eval_precision": 0.7910576096302665,
+    "eval_recall": 0.8695652173913043,
+    "eval_f1": 0.8284556506078343,
+    "eval_runtime": 34.3084,
+    "eval_samples_per_second": 14.574,
+    "eval_steps_per_second": 1.836,
+    "epoch": 8.0
+  },
+  "best_checkpoint": "./phi_deid_model\\checkpoint-3000",
+  "best_epoch": 3.0,
+  "best_metric_name": "recall",
+  "best_metric_value": 0.8695652173913043
+}
