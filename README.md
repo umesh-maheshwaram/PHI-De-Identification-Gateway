@@ -12,55 +12,10 @@ the LezDo TechMed AI/ML internship assessment.
 
 ---
 
+
 ## Architecture
+![Architecture](docs/pipeline_architecture.png)
 
-```
-┌─────────────────────────── DATA & LABELS ───────────────────────────┐
-│  labels.py               ──label set──▶   data_gen.py                │
-│  HIPAA label schema                       Synthetic train/eval        │
-│  + BIO tags                               templates                  │
-└────────────────────────────────────────────────────────────────────┘
-                │ BIO_TAGS + weights          │ TRAIN_TEMPLATES
-                ▼                             ▼
-┌─────────────────────────── MODEL TRAINING ───────────────────────────┐
-│                        train.py                                       │
-│         Fine-tune DistilBERT (66M params)                             │
-│              + LoRA/QLoRA optional (--lora)                           │
-│                        │ saves                                        │
-│                        ▼                                              │
-│              phi_deid_model/ (checkpoint)                             │
-└────────────────────────────────────────────────────────────────────┘
-                        │ load
-                        ▼
-┌──────────────────────────── DETECTORS ───────────────────────────────┐
-│  regex_baseline.py        Fine-tuned DistilBERT        Presidio/spaCy │
-│  Baseline (a):            (loaded from                 Baseline (b), │
-│  structured regex          phi_deid_model)              optional      │
-└────────────────────────────────────────────────────────────────────┘
-        │ baseline a          │ model alone          │ baseline b
-        ▼                     ▼                       ▼
-┌─────────────────────── EVALUATION HARNESS ───────────────────────────┐
-│  whitfield_gold.py  ──fills gaps──▶      evaluate.py                  │
-│  Real hand-labeled                       Scores regex / Presidio /    │
-│  gold text                               model / ensemble             │
-│  (trust this number                      → P/R/F1 + leak rate         │
-│   most)                                                                │
-└────────────────────────────────────────────────────────────────────┘
-                        │ --batch demo
-                        ▼
-┌────────────────────── PRODUCTION GATEWAY (gateway.py) ───────────────┐
-│  build_ensemble_detector()    deidentify() / rehydrate()   Foundation │
-│  regex claims first,      ──▶ + pre-send leak self-check──▶ LLM       │
-│  model fills gaps             masked_text, mapping          (Groq /   │
-│                                                     masked_text only   Anthropic│
-│                                                               / Ollama)│
-└────────────────────────────────────────────────────────────────────┘
-        → rehydrated response returned to caller
-          (mapping never leaves the server, never sent to the LLM)
-```
-
-*A rendered version of this diagram is included at
-[`docs/pipeline_architecture.png`](docs/pipeline_architecture.png).*
 
 ### Why this shape, not model-only
 
